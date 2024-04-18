@@ -1,34 +1,37 @@
-const prompt = require('prompt-sync')({sigint: true});
+const prompt = require("prompt-sync")({ sigint: true });
 
-const hat = '^';
-const hole = 'O';
-const fieldCharacter = '░';
-const pathCharacter = '*';
+const hat = "^";
+const hole = "O";
+const fieldCharacter = "░";
+const pathCharacter = "*";
+let playerX = null;
+let playerY = null;
 
 class Field {
   constructor(field = [[]]) {
     this.field = field;
-    //this.locationX = 0;
-    //this.locationY = 0;
+    this.locationX = playerX;
+    this.locationY = playerY;
     // Set the "home" position before the game starts
     //this.field[0][0] = pathCharacter;
   }
 
   runGame() {
+    console.log(`X:${this.locationX} Y:${this.locationY}`);
     let playing = true;
     while (playing) {
       this.print();
       this.askQuestion();
       if (!this.isInBounds()) {
-        console.log('Out of bounds instruction!');
+        console.log("Out of bounds instruction!");
         playing = false;
         break;
       } else if (this.isHole()) {
-        console.log('Sorry, you fell down a hole!');
+        console.log("Sorry, you fell down a hole!");
         playing = false;
         break;
       } else if (this.isHat()) {
-        console.log('Congrats, you found your hat!');
+        console.log("Congrats, you found your hat!");
         playing = false;
         break;
       }
@@ -38,22 +41,22 @@ class Field {
   }
 
   askQuestion() {
-    const answer = prompt('Which way? ').toUpperCase();
+    const answer = prompt("Which way? ").toUpperCase();
     switch (answer) {
-      case 'U':
+      case "U":
         this.locationY -= 1;
         break;
-      case 'D':
+      case "D":
         this.locationY += 1;
         break;
-      case 'L':
+      case "L":
         this.locationX -= 1;
         break;
-      case 'R':
+      case "R":
         this.locationX += 1;
         break;
       default:
-        console.log('Enter U, D, L or R.');
+        console.log("Enter U, D, L or R.");
         this.askQuestion();
         break;
     }
@@ -77,14 +80,16 @@ class Field {
   }
 
   print() {
-    const displayString = this.field.map(row => {
-        return row.join('');
-      }).join('\n');
+    const displayString = this.field
+      .map((row) => {
+        return row.join("");
+      })
+      .join("\n");
     console.log(displayString);
   }
 
   static generateField(height, width, percentage = 0.1) {
-    const field = new Array(height).fill(0).map(el => new Array(width));
+    const field = new Array(height).fill(0).map((el) => new Array(width));
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const prob = Math.random();
@@ -92,20 +97,19 @@ class Field {
       }
     }
 
-    
-      this.locationX = Math.floor(Math.random() * width)
-      this.locationY = Math.floor(Math.random() * height)
-    
+    playerX = Math.floor(Math.random() * width);
+    playerY = Math.floor(Math.random() * height);
+    console.log(`X:${playerX} Y:${playerY}`);
 
-    field[this.locationY][this.locationX] = pathCharacter
+    field[playerY][playerX] = pathCharacter;
 
     // Set the "hat" location
     const hatLocation = {
       x: Math.floor(Math.random() * width),
-      y: Math.floor(Math.random() * height)
+      y: Math.floor(Math.random() * height),
     };
     // Make sure the "hat" is not at the starting point
-    while (hatLocation.x === this.locationX && hatLocation.y === this.locationY) {
+    while (hatLocation.x === playerX && hatLocation.y === playerY) {
       hatLocation.x = Math.floor(Math.random() * width);
       hatLocation.y = Math.floor(Math.random() * height);
     }
